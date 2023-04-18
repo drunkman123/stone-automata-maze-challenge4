@@ -14,6 +14,7 @@ bool Found = false;
 int Foundid = 0;
 int loopCounter = 0;
 int newIndex = 0;
+byte countDeadEnd = 0;
 //Stack<PositionStep> stack = new Stack<PositionStep>(52000);
 
 #endregion
@@ -21,7 +22,7 @@ int newIndex = 0;
 #region Setup Data Set
 byte[][] baseMatrice;
 byte[][] extractMatrice = new byte[10][];
-(int,int) longestCell = (0,0);
+(int, int) longestCell = (0, 0);
 
 ReadFileToMatrix();
 ReadAndInsertExtract();
@@ -33,12 +34,12 @@ for (int i = 2301; i < 2311; i++)
     {
         //Console.Write(baseMatrice[i][j].ToString() + " ");
 
-        baseMatrice[i][j] = extractMatrice[i - 2301][j-2301];
+        baseMatrice[i][j] = extractMatrice[i - 2301][j - 2301];
 
     }
     Console.WriteLine("\r");
 }
-int diagonal = (int)(Math.Sqrt(Math.Pow(Goal.Item1 + 1, 2) + Math.Pow(Goal.Item2 + 1, 2)) * 4);
+int diagonal = (int)(Math.Sqrt(Math.Pow(Goal.Item1 + 1, 2) + Math.Pow(Goal.Item2 + 1, 2)) * 1);
 
 
 int lines;
@@ -47,21 +48,9 @@ int lengthTotal = lines * columns;
 PositionStep?[] positionSteps = new PositionStep?[lengthTotal + 100];
 List<int> toBeAddedIndex = new List<int>(lengthTotal + 100);
 List<PositionStep> listRodada = new List<PositionStep>(lengthTotal / 4);
-//stack.Push(new PositionStep(Start.Item1, Start.Item2, '\0', null));
 listRodada.Add(new PositionStep(Start.Item1, Start.Item2, '\0', null, 1));
 byte[][] tempMatrice = new byte[baseMatrice.Length][];
-//Console.WriteLine("\n");
 
-//for (int i = 2301; i < 2311; i++)
-//{
-//    for (int j = 2301; j < 2311; j++)
-//    {
-//        //baseMatrice[i][j] = extractMatrice[i - 2301][j - 2301];
-//        Console.Write(baseMatrice[i][j].ToString() + " ");
-
-//    }
-//    Console.WriteLine("\r");
-//}
 for (int i = 0; i < baseMatrice.Length; i++)
 {
     tempMatrice[i] = new byte[columns + 2];
@@ -76,7 +65,6 @@ while (!Found && !DeadEnd)
     //start and goal set to 0 to not mess with the stepexecute
     StepExecute();
     //CheckChanges();
-
     baseMatrice[Start.Item1][Start.Item2] = 0;
     baseMatrice[Goal.Item1][Goal.Item2] = 0;
     //printMatrix(baseMatrice, "1");
@@ -151,112 +139,41 @@ void StepExecute()
     Swap(ref baseMatrice, ref tempMatrice);
 }
 
-
-/*void StepExecute()
-{
-    //tempMatrice = baseMatrice;
-    Parallel.For(1, (int)lines + 1, i =>
-    {
-        for (int j = 1; j <= columns; j++)
-        {
-            if (baseMatrice[i][j] == 0) continue;
-            Interlocked.Increment(ref tempMatrice[i - 1][j - 1]);
-            Interlocked.Increment(ref tempMatrice[i - 1][j]);
-            Interlocked.Increment(ref tempMatrice[i - 1][j + 1]);
-            Interlocked.Increment(ref tempMatrice[i][j - 1]);
-            Interlocked.Increment(ref tempMatrice[i][j + 1]);
-            Interlocked.Increment(ref tempMatrice[i + 1][j - 1]);
-            Interlocked.Increment(ref tempMatrice[i + 1][j]);
-            Interlocked.Increment(ref tempMatrice[i + 1][j + 1]);
-        }
-    });
-}
-void CheckChanges()
-{
-    for (int i = 1; i <= lines; i++)
-    {
-        for (int j = 1; j <= columns; j++)
-        {
-            if (baseMatrice[i][j] == 0 && (tempMatrice[i][j] > 1 && tempMatrice[i][j] < 5))
-            {
-                baseMatrice[i][j]++;
-                continue;
-            }
-            if (baseMatrice[i][j] == 1 && (tempMatrice[i][j] <= 3 || tempMatrice[i][j] >= 6)) 
-                baseMatrice[i][j]--;
-        }
-    }
-    for (int i = 0; i < tempMatrice.Length; i++)
-    {
-        Array.Clear(tempMatrice[i], 0, tempMatrice[i].Length);
-    }
-}*/
 void TryPath()
 {
-
-    //while (stack.Count > 0)
-    //{
-    //    PositionStep loopStack = stack.Pop();
-    //    if (baseMatrice[loopStack.item1][loopStack.item2 - 1] == 0) listRodada.Add(new PositionStep(loopStack.item1, loopStack.item2 - 1, 'L', loopStack));
-
-    //    if (baseMatrice[loopStack.item1 - 1][loopStack.item2] == 0) listRodada.Add(new PositionStep(loopStack.item1 - 1, loopStack.item2, 'U', loopStack));
-
-    //    if (baseMatrice[loopStack.item1][loopStack.item2 + 1] == 0) listRodada.Add(new PositionStep(loopStack.item1, loopStack.item2 + 1, 'R', loopStack));
-
-    //    if (baseMatrice[loopStack.item1 + 1][loopStack.item2] == 0) listRodada.Add(new PositionStep(loopStack.item1+1, loopStack.item2, 'D', loopStack));
-    //}
-    //foreach (var i in listRodada)
-    //{
-    //    if (i.item1 == Goal.Item1)
-    //    {
-    //        if (i.item2 == Goal.Item2)
-    //        {
-    //            stack.Push(i);
-    //            Found = true;
-    //            break;
-    //        }
-    //    }
-    //    stack.Push(i);
-    //};
-
-    ////DeadEnd = listRodada.Count == 0;
-    //listRodada.Clear();
-    //loopCounter++;
-    if(listRodada.Count == 0)
-    {
-        Found = true;
-        return;
-    }
     foreach (var i in listRodada)
     {
-        if (i.item1 > longestCell.Item1)
+        if (i.item2 + i.item1 > longestCell.Item2 + longestCell.Item1)
         {
-            if (i.item2 > longestCell.Item2)
-            { 
-                longestCell.Item1 = i.item1;
-                longestCell.Item2 = i.item2;
-                //Console.WriteLine(loopCounter);
-                //Console.WriteLine(longestCell.Item1 +"," +longestCell.Item2);
-
-            }
+            longestCell.Item1 = i.item1;
+            longestCell.Item2 = i.item2;
+            //Console.WriteLine(loopCounter);
+            //Console.WriteLine(longestCell.Item1 +"," +longestCell.Item2);
         }
+
         if (i.item1 == 1 && i.item2 == 1 && !Found)
         {
             checkRight(i);
             checkDown(i);
+            countDeadEnd++;
             continue;
         }
         if (i.item1 == 1 && i.item2 != 1 && i.item2 != columns && !Found)
         {
-            checkRight(i);
             checkDown(i);
             checkLeft(i);
+            checkRight(i);
+
+            countDeadEnd++;
+
             continue;
         }
         if (i.item1 == 1 && i.item2 == columns && !Found)
         {
             checkLeft(i);
             checkDown(i);
+            countDeadEnd++;
+
             continue;
         }
         if (i.item1 != 1 && i.item1 != lines && i.item2 == 1 && !Found)
@@ -264,6 +181,8 @@ void TryPath()
             checkRight(i);
             checkDown(i);
             checkUp(i);
+            countDeadEnd++;
+
             continue;
         }
         if (i.item1 != 1 && i.item1 != lines && i.item2 != 1 && i.item2 != columns && !Found)
@@ -272,6 +191,8 @@ void TryPath()
             checkDown(i);
             checkUp(i);
             checkLeft(i);
+            countDeadEnd++;
+
             continue;
         }
         if (i.item1 != 1 && i.item1 != lines && i.item2 == columns && !Found)
@@ -279,12 +200,16 @@ void TryPath()
             checkUp(i);
             checkLeft(i);
             checkLastDown(i);
+            countDeadEnd++;
+
             continue;
         }
         if (i.item1 == lines && i.item2 == 1 && !Found)
         {
             checkUp(i);
             checkRight(i);
+            countDeadEnd++;
+
             continue;
         }
         if (i.item1 == lines && i.item2 != 1 && i.item2 != columns && !Found)
@@ -292,20 +217,16 @@ void TryPath()
             checkLeft(i);
             checkUp(i);
             checkLastRight(i);
-            continue;
-        }
-        if(i.item1 ==1150 && i.item2 == 1150)
-        {
+            countDeadEnd++;
 
+            continue;
         }
         if (Found)
         {
             break;
         }
-
     }
     listRodada.Clear();
-    //toBeAddedIndex = toBeAddedIndex.Distinct().ToList();
 
     foreach (var index in toBeAddedIndex)
     {
@@ -320,10 +241,9 @@ void TryPath()
     {
         var itens = listRodada.OrderByDescending(c => c.item1 + c.item2).Skip(diagonal).ToArray();
         foreach (var item in itens)
-            listRodada.Remove(item);
+        listRodada.Remove(item);
     }
     toBeAddedIndex.Clear();
-    //DeadEnd = listRodada.Count == 0;
     loopCounter++;
 }
 
@@ -341,6 +261,16 @@ void checkUp(PositionStep i)
 }
 void checkRight(PositionStep i)
 {
+    if (i.item2 + 1 == 2300 && i.item1 == 2)
+    {
+        newIndex = i.item1 * lines + i.item2 + 1 - lines;
+        positionSteps[newIndex] = new PositionStep(i.item1, i.item2 + 1, 'R', i, newIndex);
+        toBeAddedIndex.Clear();
+        toBeAddedIndex.Add(newIndex);
+        Foundid = newIndex;
+        Found = true;
+        return;
+    }
     if (baseMatrice[i.item1][i.item2 + 1] == 0)
     {
         newIndex = i.item1 * lines + i.item2 + 1 - lines;
@@ -433,60 +363,13 @@ void printMatrix(byte[][] matrix, string name)
     Console.Write("\n");
 
 }
-void printMatrix2(byte[][] matrix, string name)
-{
-    Console.Write(name + "\n");
 
-    for (int i = 0; i < 10; i++)
-    {
-        for (int j = 0; j < 10; j++)
-        {
 
-            Console.Write(matrix[i][j].ToString() + " ");
-        }
-
-        Console.Write("\n");
-
-    }
-    Console.Write("\n");
-
-}
-/*void AddRoute(PositionStep parent, (int, int) lastPosition, char route)
-{
-    var newPosition = lastPosition;
-    switch (route)
-    {
-        case 'D':
-            newPosition.Item1 += 1;
-            break;
-        case 'R':
-            newPosition.Item2 += 1;
-            break;
-        case 'L':
-            newPosition.Item2 -= 1;
-            break;
-        case 'U':
-            newPosition.Item1 -= 1;
-            break;
-    }
-    listRodada.Add(new PositionStep { End = newPosition, Start = lastPosition, Step = route, Parent = parent });
-
-    //countDeadEnd++;
-    //Found = newPosition == Goal;
-    //if (newPosition == Goal)
-    //{
-    //    Found = true;
-    //    PositionStep lastElement = listRodada.Last();
-    //    listRodada.Clear();
-    //    stack.Clear();
-    //    stack.Push(lastElement);
-    //}
-}*/
 void ReadFileToMatrix()
 {
     //using (FileStream fileStream = new FileStream("C:\\Users\\felip\\OneDrive\\Área de Trabalho\\input.txt", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-    //using (FileStream fileStream = new FileStream("C:\\Users\\41140878859\\Desktop\\projetos_git\\stone-automata-maze-challenge\\input.txt", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-    using (FileStream fileStream = new FileStream("E:\\Git pessoal\\stone-automata-maze-challenge4\\input4.txt", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+    using (FileStream fileStream = new FileStream("C:\\Users\\41140878859\\Desktop\\projetos_git\\stone-automata-maze-challenge4\\input4.txt", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+    //using (FileStream fileStream = new FileStream("E:\\Git pessoal\\stone-automata-maze-challenge4\\input4.txt", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
     {
         // Construct the input string
         StringBuilder inputBuilder = new StringBuilder();
@@ -540,8 +423,8 @@ void ReadFileToMatrix()
 void ReadAndInsertExtract()
 {
     //using (FileStream fileStream = new FileStream("C:\\Users\\felip\\OneDrive\\Área de Trabalho\\input.txt", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-    //using (FileStream fileStream = new FileStream("C:\\Users\\41140878859\\Desktop\\projetos_git\\stone-automata-maze-challenge\\input.txt", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-    using (FileStream fileStream = new FileStream("E:\\Git pessoal\\stone-automata-maze-challenge4\\extracted_input.txt", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+    using (FileStream fileStream = new FileStream("C:\\Users\\41140878859\\Desktop\\projetos_git\\stone-automata-maze-challenge4\\extracted_input.txt", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+    //using (FileStream fileStream = new FileStream("E:\\Git pessoal\\stone-automata-maze-challenge4\\extracted_input.txt", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
     {
         // Construct the input string
         StringBuilder inputBuilder = new StringBuilder();
@@ -560,7 +443,7 @@ void ReadAndInsertExtract()
         var linesExtract = FileLines.Length;
 
         // Create new jagged array with border
-        
+
         for (int i = 0; i < extractMatrice.Length; i++)
         {
             extractMatrice[i] = new byte[columnsExtract];
@@ -578,16 +461,7 @@ void ReadAndInsertExtract()
                 }
             }
         }
-        //for (int j = 0; j <= columns + 1; j++)
-        //{
-        //    baseMatrice[0][j] = 1; // top border
-        //    baseMatrice[lines + 1][j] = 1; // bottom border
-        //}
-        //for (int i = 1; i <= lines + 1; i++)
-        //{
-        //    baseMatrice[i][0] = 1; // left border
-        //    baseMatrice[i][columns + 1] = 1; // right border
-        //}
+
     }
 }
 
@@ -683,21 +557,8 @@ void ReadAndInsertExtract()
     }
 }*/
 
-//public class TupleEqualityComparer : IEqualityComparer<PositionStep>
-//{
-//    public bool Equals(PositionStep x, PositionStep y)
-//    {
-//        return x.id.Equals(y.id);
-//    }
-
-//    public int GetHashCode(PositionStep obj)
-//    {
-//        return obj.id.GetHashCode();
-//    }
-//}
 public class PositionStep
 {
-    //public (int,int) end { get; set; }
     public readonly int item1;
     public readonly int item2;
     public readonly char Step;
@@ -713,21 +574,4 @@ public class PositionStep
         id = Id;
     }
 
-    //public PositionStep((int,int) End, char step, PositionStep? parent)
-    //{
-    //    end = End;
-    //    Step = step;
-    //    Parent = parent;
-    //}
-
-
-
-
-    //public bool Equals(PositionStep? other)
-    //{
-    //    if (other == null)
-    //        return false;
-
-    //    return this.end == other.end;
-    //}
 }
