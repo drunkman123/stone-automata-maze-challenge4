@@ -38,7 +38,7 @@ for (int i = 2301; i < 2311; i++)
     }
     Console.WriteLine("\r");
 }
-int diagonal = (int)(Math.Sqrt(Math.Pow(Goal.Item1 + 1, 2) + Math.Pow(Goal.Item2 + 1, 2)) * 2);
+int diagonal = (int)(Math.Sqrt(Math.Pow(Goal.Item1 + 1, 2) + Math.Pow(Goal.Item2 + 1, 2)) * 4);
 
 
 int lines;
@@ -232,10 +232,12 @@ void TryPath()
         if (i.item1 > longestCell.Item1)
         {
             if (i.item2 > longestCell.Item2)
-            {
+            { 
                 longestCell.Item1 = i.item1;
                 longestCell.Item2 = i.item2;
                 //Console.WriteLine(loopCounter);
+                //Console.WriteLine(longestCell.Item1 +"," +longestCell.Item2);
+
             }
         }
         if (i.item1 == 1 && i.item2 == 1 && !Found)
@@ -292,7 +294,10 @@ void TryPath()
             checkLastRight(i);
             continue;
         }
+        if(i.item1 ==1150 && i.item2 == 1150)
+        {
 
+        }
         if (Found)
         {
             break;
@@ -347,6 +352,7 @@ void checkRight(PositionStep i)
 }
 void checkLastRight(PositionStep i)
 {
+
     if (baseMatrice[i.item1][i.item2 + 1] == 0)
     {
         if ((i.item1, i.item2 + 1) == Goal)
